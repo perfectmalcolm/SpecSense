@@ -1,3 +1,5 @@
 fastapi
 google-generativeai
 uvicorn
+psycopg2-binary
+SQLAlchemy
