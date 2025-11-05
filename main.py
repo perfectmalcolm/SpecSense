@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
-from typing import List
+from typing import List, Optional
 
 import crud, models, schemas
 from database import SessionLocal, engine
@@ -22,8 +22,8 @@ def create_gadget(gadget: schemas.GadgetCreate, db: Session = Depends(get_db)):
     return crud.create_gadget(db=db, gadget=gadget)
 
 @app.get("/gadgets/", response_model=List[schemas.Gadget])
-def read_gadgets(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-    gadgets = crud.get_gadgets(db, skip=skip, limit=limit)
+def read_gadgets(skip: int = 0, limit: int = 100, name_contains: Optional[str] = None, db: Session = Depends(get_db)):
+    gadgets = crud.get_gadgets(db, skip=skip, limit=limit, name_contains=name_contains)
     return gadgets
 
 @app.get("/gadgets/{gadget_id}", response_model=schemas.Gadget)
