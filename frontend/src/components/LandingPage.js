@@ -1,40 +1,43 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React from "react";
+import { Link } from "react-router-dom";
 
 function LandingPage() {
   return (
-    <div className="bg-gray-100 min-h-screen flex flex-col items-center justify-center">
-      <div className="max-w-2xl w-full mx-auto p-8">
-        <h1 className="text-4xl font-bold text-center text-gray-800 mb-8">
+    <div className="bg-figma-primary-bg min-h-screen flex flex-col items-center justify-center font-sans">
+      <div className="max-w-2xl w-full mx-auto p-8 text-center">
+        <h1 className="text-6xl font-bold text-figma-primary-text mb-4">
           SpecSense
         </h1>
-        <div className="relative">
+        <p className="text-xl text-figma-secondary-text mb-12">
+          The easiest way to compare your favorite gadgets.
+        </p>
+        <div className="relative mx-auto max-w-xl">
           <input
             type="text"
-            placeholder="What gadget are you looking for?"
-            className="w-full px-4 py-3 text-lg border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Search for a gadget..."
+            className="w-full px-6 py-4 text-lg border-2 border-figma-outline rounded-full focus:outline-none focus:ring-2 focus:ring-figma-primary-action"
           />
-          <button className="absolute top-1/2 right-3 transform -translate-y-1/2 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">
+          <button className="absolute top-1/2 right-4 transform -translate-y-1/2 bg-figma-primary-action text-white px-5 py-2.5 rounded-full hover:bg-opacity-90 transition-colors">
             Search
           </button>
         </div>
-        <div className="flex justify-center space-x-4 mt-8">
-          <button className="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300">
+        <div className="flex justify-center space-x-4 mt-10">
+          <button className="text-figma-secondary-text px-4 py-2 rounded-lg hover:text-figma-primary-text transition-colors">
             Phones
           </button>
-          <button className="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300">
+          <button className="text-figma-secondary-text px-4 py-2 rounded-lg hover:text-figma-primary-text transition-colors">
             Laptops
           </button>
-          <button className="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300">
+          <button className="text-figma-secondary-text px-4 py-2 rounded-lg hover:text-figma-primary-text transition-colors">
             Earbuds
           </button>
-          <button className="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300">
+          <button className="text-figma-secondary-text px-4 py-2 rounded-lg hover:text-figma-primary-text transition-colors">
             TVs
           </button>
         </div>
-        <div className="text-center mt-8">
+        <div className="mt-16">
           <Link to="/select">
-            <button className="bg-green-500 text-white px-8 py-3 rounded-lg text-lg font-semibold hover:bg-green-600">
+            <button className="bg-figma-primary-action text-white px-12 py-4 rounded-full text-lg font-semibold hover:bg-opacity-90 transition-colors">
               Compare Now
             </button>
           </Link>
@@ -45,3 +48,4 @@ function LandingPage() {
 }
 
 export default LandingPage;
+
