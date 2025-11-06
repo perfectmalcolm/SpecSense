@@ -9,33 +9,28 @@ function ProductSelection() {
   const [searchResults, setSearchResults] = useState([]);
 
   useEffect(() => {
-    const fetchGadgets = async () => {
-      const category = searchParams.get("category");
-      let url = "http://localhost:8081/gadgets/";
-
+    const fetchSuggestions = async () => {
       if (searchTerm.length > 2) {
-        url = `http://localhost:8081/gadgets/?name_contains=${searchTerm}`;
-      } else if (category) {
-        url = `http://localhost:8081/gadgets/?category=${category}`;
-      }
-
-      try {
-        const response = await fetch(url);
-        const data = await response.json();
-        if (searchTerm.length > 2) {
-          setSuggestions(data);
-          setSearchResults([]);
-        } else {
-          setSearchResults(data);
-          setSuggestions([]);
+        const category = searchParams.get("category");
+        let url = `https://specsense-backend-575113697963.us-central1.run.app/search?query=${searchTerm}`;
+        if (category) {
+          url = `${url}&category=${category}`;
         }
-      } catch (error) {
-        console.error("Error fetching gadgets:", error);
+        try {
+          const response = await fetch(url);
+          const data = await response.json();
+          setSuggestions(data.items || []);
+          setSearchResults([]);
+        } catch (error) {
+          console.error("Error fetching suggestions:", error);
+        }
+      } else {
+        setSuggestions([]);
       }
     };
 
     const handler = setTimeout(() => {
-      fetchGadgets();
+      fetchSuggestions();
     }, 300);
 
     return () => {
@@ -43,12 +38,10 @@ function ProductSelection() {
     };
   }, [searchTerm, searchParams]);
 
-  const handleSelectGadget = (gadget) => {
-    if (selectedGadgets.find((g) => g.id === gadget.id)) {
-      setSelectedGadgets(selectedGadgets.filter((g) => g.id !== gadget.id));
-    } else {
-      setSelectedGadgets([...selectedGadgets, gadget]);
-    }
+  const handleSelectSuggestion = (suggestion) => {
+    setSearchTerm(suggestion.title);
+    setSuggestions([]);
+    setSearchResults([suggestion]);
   };
 
   return (
@@ -72,13 +65,13 @@ function ProductSelection() {
               />
               {suggestions.length > 0 && (
                 <ul className="absolute z-10 w-full bg-white border border-gray-300 rounded-lg mt-1 max-h-60 overflow-auto">
-                  {suggestions.map((gadget) => (
+                  {suggestions.map((suggestion) => (
                     <li
-                      key={gadget.id}
+                      key={suggestion.link}
                       className="px-4 py-2 cursor-pointer hover:bg-gray-200"
-                      onClick={() => handleSelectGadget(gadget)}
+                      onClick={() => handleSelectSuggestion(suggestion)}
                     >
-                      {gadget.name} ({gadget.brand})
+                      {suggestion.title}
                     </li>
                   ))}
                 </ul>
@@ -155,21 +148,21 @@ function ProductSelection() {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-              {searchResults.map((gadget) => (
+              {searchResults.map((result) => (
                 <div
-                  key={gadget.id}
-                  className={`bg-white rounded-lg shadow-md overflow-hidden cursor-pointer transform hover:-translate-y-1 transition-transform duration-300 ${selectedGadgets.find(g => g.id === gadget.id) ? 'ring-2 ring-blue-500' : ''}`}
-                  onClick={() => handleSelectGadget(gadget)}
+                  key={result.link}
+                  className={`bg-white rounded-lg shadow-md overflow-hidden cursor-pointer transform hover:-translate-y-1 transition-transform duration-300`}
                 >
-                  <img
-                    src={gadget.image_url || 'https://via.placeholder.com/300x200'}
-                    alt={gadget.name}
-                    className="w-full h-40 object-cover"
-                  />
-                  <div className="p-4">
-                    <h3 className="text-lg font-semibold text-gray-900 truncate">{gadget.name}</h3>
-                    <p className="text-sm text-gray-500 mt-1">{gadget.brand}</p>
-                  </div>
+                  <a href={result.link} target="_blank" rel="noopener noreferrer">
+                    <img
+                      src={result.pagemap?.cse_image?.[0]?.src}
+                      alt={result.title}
+                      className="w-full h-40 object-cover"
+                    />
+                    <div className="p-4">
+                      <h3 className="text-lg font-semibold text-gray-900 truncate">{result.title}</h3>
+                    </div>
+                  </a>
                 </div>
               ))}
             </div>

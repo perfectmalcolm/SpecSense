@@ -1,13 +1,26 @@
 from fastapi import FastAPI, Depends, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from typing import List, Optional
 
-import crud, models, schemas
+import crud, models, schemas, google_search
 from database import SessionLocal, engine
 
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
+
+origins = [
+    "https://specsense-c3c45bad.web.app",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Dependency
 def get_db():
@@ -33,18 +46,10 @@ def read_gadget(gadget_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Gadget not found")
     return db_gadget
 
+@app.get("/search")
+def search(query: str, category: str = None):
+    return google_search.search_products(query, category)
+
 @app.get("/")
 def read_root():
     return {"Hello": "World"}
-
-@app.get("/add_test_gadget")
-def add_test_gadget(db: Session = Depends(get_db)):
-    gadget_data = schemas.GadgetCreate(
-        name="Test Gadget",
-        brand="Test Brand",
-        os="Test OS",
-        release_year=2024,
-        specs={"test_spec": "test_value"}
-    )
-    crud.create_gadget(db=db, gadget=gadget_data)
-    return {"message": "Test gadget added successfully!"}

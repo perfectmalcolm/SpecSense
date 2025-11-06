@@ -1,5 +1,7 @@
 fastapi
-google-generativeai
 uvicorn
 psycopg2-binary
 SQLAlchemy
+pydantic
+requests
+google-api-python-client
