@@ -3,8 +3,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from typing import List, Optional
 
-import crud, models, schemas, google_search
+import crud, models, schemas, google_search, ranking
 from database import SessionLocal, engine
+from pydantic import BaseModel
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -21,6 +22,12 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Pydantic model for the ranking request
+class RankingRequest(BaseModel):
+    price_min: float
+    price_max: float
+    ranking_preference: str
 
 # Dependency
 def get_db():
@@ -45,6 +52,21 @@ def read_gadget(gadget_id: int, db: Session = Depends(get_db)):
     if db_gadget is None:
         raise HTTPException(status_code=404, detail="Gadget not found")
     return db_gadget
+
+@app.post("/rankings/", response_model=List[schemas.Gadget])
+def get_rankings(request: RankingRequest, db: Session = Depends(get_db)):
+    gadgets = crud.get_gadgets(db, skip=0, limit=1000) # Get all gadgets
+    
+    # The gadgets from crud are SQLAlchemy models, need to convert them to dicts
+    gadgets_dict = [schemas.Gadget.model_validate(g).model_dump() for g in gadgets]
+
+    ranked_gadgets = ranking.rank_gadgets(
+        gadgets=gadgets_dict,
+        price_min=request.price_min,
+        price_max=request.price_max,
+        ranking_preference=request.ranking_preference
+    )
+    return ranked_gadgets
 
 @app.get("/search")
 def search(query: str, category: str = None):

@@ -6,6 +6,7 @@ class GadgetCreate(BaseModel):
     brand: str
     os: str
     release_year: int
+    price: float
     specs: Dict
 
 class Gadget(GadgetCreate):

@@ -1,15 +1,11 @@
 # recommender.py
+from typing import List, Dict
 
-def get_recommendation(product_category: str):
+def get_top_recommendation(gadgets: List[Dict]) -> Dict:
     """
-    Returns a dummy recommendation for a given product category.
+    Returns the top recommended gadget from a list.
+    For now, it just returns the first gadget.
     """
-    return {
-        "product_category": product_category,
-        "recommendation": "Dummy Phone",
-        "specs": {
-            "display": "6.1-inch",
-            "camera": "12MP",
-            "battery": "3000mAh"
-        }
-    }
+    if not gadgets:
+        return {}
+    return gadgets[0]

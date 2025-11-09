@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, JSON
+from sqlalchemy import Column, Integer, String, JSON, Float
 from database import Base
 
 class Gadget(Base):
@@ -9,4 +9,5 @@ class Gadget(Base):
     brand = Column(String)
     os = Column(String)
     release_year = Column(Integer)
+    price = Column(Float)
     specs = Column(JSON)
