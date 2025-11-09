@@ -7,6 +7,20 @@ function ProductSelection() {
   const [suggestions, setSuggestions] = useState([]);
   const [selectedGadgets, setSelectedGadgets] = useState([]);
   const [searchResults, setSearchResults] = useState([]);
+  const [gadgets, setGadgets] = useState([]);
+
+  useEffect(() => {
+    const fetchGadgets = async () => {
+      try {
+        const response = await fetch("https://specsense-backend-575113697963.us-central1.run.app/gadgets/");
+        const data = await response.json();
+        setGadgets(data);
+      } catch (error) {
+        console.error("Error fetching gadgets:", error);
+      }
+    };
+    fetchGadgets();
+  }, []);
 
   useEffect(() => {
     const fetchSuggestions = async () => {
@@ -148,6 +162,17 @@ function ProductSelection() {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+              {gadgets.map((gadget) => (
+                <div
+                  key={gadget.id}
+                  className={`bg-white rounded-lg shadow-md overflow-hidden cursor-pointer transform hover:-translate-y-1 transition-transform duration-300`}
+                >
+                  <div className="p-4">
+                    <h3 className="text-lg font-semibold text-gray-900 truncate">{gadget.name}</h3>
+                    <p className="text-sm text-gray-600">{gadget.brand}</p>
+                  </div>
+                </div>
+              ))}
               {searchResults.map((result) => (
                 <div
                   key={result.link}
