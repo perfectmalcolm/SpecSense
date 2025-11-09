@@ -26,8 +26,8 @@ jobs:
 
       - name: Build and Push Docker Image
         run: |
-          docker build -t gcr.io/specsense-c3c45bad/specsense-backend:latest .
-          docker push gcr.io/specsense-c3c45bad/specsense-backend:latest
+          docker build -t gcr.io/${{ secrets.GCP_PROJECT_ID }}/specsense-backend:latest .
+          docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/specsense-backend:latest
 
       - name: Deploy to Cloud Run
         run: |
