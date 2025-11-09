@@ -1,0 +1,38 @@
+name: Deploy Backend to Cloud Run
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Google Auth
+        id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Docker Auth
+        run: gcloud auth configure-docker --quiet
+
+      - name: Build and Push Docker Image
+        run: |
+          docker build -t gcr.io/${{ secrets.GCP_PROJECT_ID }}/specsense-backend:latest .
+          docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/specsense-backend:latest
+
+      - name: Deploy to Cloud Run
+        run: |
+          gcloud run deploy specsense-backend \
+            --image gcr.io/${{ secrets.GCP_PROJECT_ID }}/specsense-backend:latest \
+            --region us-central1 \
+            --platform managed \
+            --allow-unauthenticated
