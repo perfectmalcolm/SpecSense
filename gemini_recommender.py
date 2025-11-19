@@ -2,14 +2,8 @@ import google.generativeai as genai
 import os
 from typing import List, Dict
 
-# IMPORTANT: You must set the GOOGLE_API_KEY environment variable.
-# You can get a key from https://aistudio.google.com/app/apikey
-try:
-    genai.configure(api_key=os.environ["GOOGLE_API_KEY"])
-except KeyError:
-    raise Exception("ERROR: The GOOGLE_API_KEY environment variable is not set. Please obtain a key from https://aistudio.google.com/app/apikey and set the environment variable.")
 
-# Set up the model
+# Set up the model configuration (moved outside to be shared)
 generation_config = {
   "temperature": 0.9,
   "top_p": 1,
@@ -36,21 +30,26 @@ safety_settings = [
   },
 ]
 
-model = genai.GenerativeModel(model_name="gemini-1.5-pro-latest",
-                              generation_config=generation_config,
-                              safety_settings=safety_settings)
-
-def generate_recommendation(user_query: str, gadgets: List[Dict]) -> str:
+def generate_recommendation(user_query: str, gadgets: List[Dict], google_api_key: str) -> str:
     """
     Generates a gadget recommendation based on a user query and a list of gadgets.
 
     Args:
         user_query: The user's request in natural language.
         gadgets: A list of dictionaries, where each dictionary represents a gadget.
+        google_api_key: The Google API key for authentication.
 
     Returns:
         A string containing the recommendation.
     """
+    if not google_api_key:
+        raise ValueError("GOOGLE_API_KEY must be provided for Gemini recommendation.")
+
+    genai.configure(api_key=google_api_key)
+    model = genai.GenerativeModel(model_name="gemini-1.5-pro-latest",
+                                  generation_config=generation_config,
+                                  safety_settings=safety_settings)
+
     if not gadgets:
         return "I couldn't find any gadgets to recommend."
 
@@ -62,7 +61,7 @@ def generate_recommendation(user_query: str, gadgets: List[Dict]) -> str:
     prompt_parts = [
         "You are an expert gadget recommender called SpecSense.",
         "A user is looking for a new gadget. Their request is:",
-        f"USER REQUEST: \"{user_query}"",
+        f"USER REQUEST: \"{user_query}\"",
         "\nBased on their request and the following list of available gadgets, please recommend the best one and provide a brief, friendly explanation for why it's a good fit.",
         "\nAVAILABLE GADGETS:",
         gadget_list_str,

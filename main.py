@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from typing import List, Optional
 
-import crud, models, schemas, google_search, ranking, gemini_recommender
+import crud, models, schemas, google_search, ranking, gemini_recommender, apify_scraper
 from database import SessionLocal, engine
 from pydantic import BaseModel
 
@@ -24,6 +24,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Pydantic model for the scraper request
+class ScrapeRequest(BaseModel):
+    api_token: str
+
 # Pydantic model for the ranking request
 class RankingRequest(BaseModel):
     price_min: float
@@ -33,6 +37,7 @@ class RankingRequest(BaseModel):
 # Pydantic model for the recommendation request
 class RecommendRequest(BaseModel):
     query: str
+    google_api_key: str
 
 # Dependency
 def get_db():
@@ -41,6 +46,14 @@ def get_db():
         yield db
     finally:
         db.close()
+
+@app.post("/scrape-gsmsarena/")
+async def scrape_gsmsarena(request: ScrapeRequest):
+    """
+    Triggers the GSMArena scraper on Apify.
+    """
+    results = await apify_scraper.run_gsmarena_scraper(api_token=request.api_token)
+    return {"status": "scraping finished", "results": results}
 
 @app.post("/recommend/", response_model=str)
 def get_recommendation(request: RecommendRequest, db: Session = Depends(get_db)):
@@ -54,7 +67,7 @@ def get_recommendation(request: RecommendRequest, db: Session = Depends(get_db))
     # Convert SQLAlchemy models to dictionaries for the recommender
     gadgets_dict = [schemas.Gadget.from_orm(g).dict() for g in gadgets]
     
-    recommendation = gemini_recommender.generate_recommendation(user_query=request.query, gadgets=gadgets_dict)
+    recommendation = gemini_recommender.generate_recommendation(user_query=request.query, gadgets=gadgets_dict, google_api_key=request.google_api_key)
     return recommendation
 
 @app.post("/gadgets/", response_model=schemas.Gadget)

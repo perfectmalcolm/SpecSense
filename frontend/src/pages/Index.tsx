@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { RankingFilter } from "@/components/RankingFilter";
 import { BrandFilter } from "@/components/BrandFilter";
 import { CategorySelector } from "@/components/CategorySelector";
@@ -28,9 +29,15 @@ const Index = () => {
       try {
         const response = await fetch("/api/gadgets/");
         const data = await response.json();
-        setGadgets(data);
-        const uniqueBrands = [...new Set(data.map(g => g.brand))];
-        setBrands(uniqueBrands);
+        if (Array.isArray(data)) {
+          setGadgets(data);
+          const uniqueBrands = [...new Set(data.map(g => g.brand))];
+          setBrands(uniqueBrands);
+        } else {
+          setGadgets([]);
+          setBrands([]);
+          console.error("Error fetching gadgets: data is not an array", data);
+        }
       } catch (error) {
         console.error("Error fetching gadgets:", error);
       }

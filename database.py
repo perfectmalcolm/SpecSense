@@ -16,13 +16,10 @@ if os.environ.get("USE_LOCAL_DB"):
     LOCAL_DB_PORT = os.environ.get("LOCAL_DB_PORT", "5432")
     DATABASE_URL = f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{LOCAL_DB_HOST}:{LOCAL_DB_PORT}/{DB_NAME}"
 else:
-    # Cloud SQL Proxy connection
-    # Hardcoding connection name for debugging
-    CLOUD_SQL_CONNECTION_NAME = "specsense-c3c45bad:us-central1:specsense-db"
-    DATABASE_URL = (
-        f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@/{DB_NAME}"
-        f"?host=/cloudsql/{CLOUD_SQL_CONNECTION_NAME}"
-    )
+    # Cloud SQL Public IP connection
+    CLOUD_SQL_HOST = "35.194.42.145" # Public IP of your Cloud SQL instance
+    CLOUD_SQL_PORT = "5432" # Default PostgreSQL port
+    DATABASE_URL = f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{CLOUD_SQL_HOST}:{CLOUD_SQL_PORT}/{DB_NAME}"
 
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
