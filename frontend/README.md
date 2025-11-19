@@ -1,38 +1,73 @@
-# SpecSense Frontend
+# Welcome to your Lovable project
 
-This is the frontend application for SpecSense, built with React and styled using Tailwind CSS. It provides a user interface for searching, filtering, and ranking electronic gadgets.
+## Project info
 
-## Technologies Used
+**URL**: https://lovable.dev/projects/2f76b6d9-48e2-48c0-a669-3e9209682160
 
-*   **Framework:** React
-*   **Styling:** Tailwind CSS
-*   **Build Tool:** Vite
-*   **Routing:** React Router DOM
+## How can I edit this code?
 
-## Features
+There are several ways of editing your application.
 
-*   **Modern UI/UX:** Features a sleek, dark-themed interface with improved typography and subtle gradients for an enhanced user experience.
-*   **Gadget Listing:** Displays gadgets fetched from the backend API.
-*   **Search Functionality:** Integrates with Google Custom Search for product suggestions.
-*   **Filtering & Ranking:** Allows users to filter gadgets by brand and price range, and rank them based on newness, flagship status, or affordability.
+**Use Lovable**
 
-## Local Development
+Simply visit the [Lovable Project](https://lovable.dev/projects/2f76b6d9-48e2-48c0-a669-3e9209682160) and start prompting.
 
-To run the frontend locally:
+Changes made via Lovable will be committed automatically to this repo.
 
-1.  **Navigate to the frontend directory:**
-    ```bash
-    cd frontend
-    ```
+**Use your preferred IDE**
 
-2.  **Install dependencies:**
-    ```bash
-    npm install
-    ```
+If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
 
-3.  **Start the development server:**
-    ```bash
-    npm run dev
-    ```
+The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
 
-The frontend will typically run on `http://localhost:5173` (or another port if 5173 is in use). Ensure the backend is also running and accessible for full functionality.
+Follow these steps:
+
+```sh
+# Step 1: Clone the repository using the project's Git URL.
+git clone <YOUR_GIT_URL>
+
+# Step 2: Navigate to the project directory.
+cd <YOUR_PROJECT_NAME>
+
+# Step 3: Install the necessary dependencies.
+npm i
+
+# Step 4: Start the development server with auto-reloading and an instant preview.
+npm run dev
+```
+
+**Edit a file directly in GitHub**
+
+- Navigate to the desired file(s).
+- Click the "Edit" button (pencil icon) at the top right of the file view.
+- Make your changes and commit the changes.
+
+**Use GitHub Codespaces**
+
+- Navigate to the main page of your repository.
+- Click on the "Code" button (green button) near the top right.
+- Select the "Codespaces" tab.
+- Click on "New codespace" to launch a new Codespace environment.
+- Edit files directly within the Codespace and commit and push your changes once you're done.
+
+## What technologies are used for this project?
+
+This project is built with:
+
+- Vite
+- TypeScript
+- React
+- shadcn-ui
+- Tailwind CSS
+
+## How can I deploy this project?
+
+Simply open [Lovable](https://lovable.dev/projects/2f76b6d9-48e2-48c0-a669-3e9209682160) and click on Share -> Publish.
+
+## Can I connect a custom domain to my Lovable project?
+
+Yes, you can!
+
+To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+
+Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)

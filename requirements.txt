@@ -5,3 +5,4 @@ SQLAlchemy
 pydantic
 requests
 google-api-python-client
+google-generativeai

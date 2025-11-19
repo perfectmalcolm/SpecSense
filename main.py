@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from typing import List, Optional
 
-import crud, models, schemas, google_search, ranking
+import crud, models, schemas, google_search, ranking, gemini_recommender
 from database import SessionLocal, engine
 from pydantic import BaseModel
 
@@ -13,6 +13,7 @@ app = FastAPI()
 
 origins = [
     "https://specsense-c3c45bad.web.app",
+    "http://localhost:3000", # Adding localhost for local development
 ]
 
 app.add_middleware(
@@ -29,6 +30,10 @@ class RankingRequest(BaseModel):
     price_max: float
     ranking_preference: str
 
+# Pydantic model for the recommendation request
+class RecommendRequest(BaseModel):
+    query: str
+
 # Dependency
 def get_db():
     db = SessionLocal()
@@ -36,6 +41,21 @@ def get_db():
         yield db
     finally:
         db.close()
+
+@app.post("/recommend/", response_model=str)
+def get_recommendation(request: RecommendRequest, db: Session = Depends(get_db)):
+    """
+    Receives a user query, gets all gadgets, and uses Gemini to generate a recommendation.
+    """
+    gadgets = crud.get_gadgets(db, skip=0, limit=1000) # Get all gadgets
+    if not gadgets:
+        raise HTTPException(status_code=404, detail="No gadgets found in the database to recommend from.")
+
+    # Convert SQLAlchemy models to dictionaries for the recommender
+    gadgets_dict = [schemas.Gadget.from_orm(g).dict() for g in gadgets]
+    
+    recommendation = gemini_recommender.generate_recommendation(user_query=request.query, gadgets=gadgets_dict)
+    return recommendation
 
 @app.post("/gadgets/", response_model=schemas.Gadget)
 def create_gadget(gadget: schemas.GadgetCreate, db: Session = Depends(get_db)):
