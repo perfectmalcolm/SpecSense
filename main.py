@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from typing import List, Optional
 
-import crud, models, schemas, google_search, ranking, gemini_recommender, apify_scraper
+import crud, models, schemas, google_search, ranking, gemini_recommender, apify_scraper, verification, market_search
 from database import SessionLocal, engine
 from pydantic import BaseModel
 
@@ -46,6 +46,43 @@ def get_db():
         yield db
     finally:
         db.close()
+
+@app.get("/search/unified")
+def search_unified(query: str, limit: int = 10, google_api_key: Optional[str] = None):
+    """
+    Searches for products across various marketplaces via web search and verifies them against official specs from Gemini.
+    """
+    # Try to get API key from env if not provided
+    import os
+    if not google_api_key:
+        google_api_key = os.environ.get("GOOGLE_API_KEY")
+
+    # 1. Get Official Specs via Gemini
+    official_specs = None
+    if google_api_key:
+        official_specs = gemini_recommender.get_product_specs(query, google_api_key)
+        if official_specs:
+            official_specs['source'] = "Gemini AI"
+    else:
+        print("Warning: No Google API Key found. Skipping official specs verification.")
+    
+    # 2. Get Marketplace Listings via DuckDuckGo (Blanket Search)
+    all_listings = market_search.search_markets(query, limit=limit)
+    
+    # 3. Verify Listings
+    verified_listings = []
+    for item in all_listings:
+        is_valid, reason = verification.verify_listing(item, official_specs)
+        item['verification'] = {
+            "status": "Verified" if is_valid else "Potential Mismatch",
+            "reason": reason
+        }
+        verified_listings.append(item)
+        
+    return {
+        "official_specs": official_specs,
+        "listings": verified_listings
+    }
 
 @app.post("/scrape-gsmsarena/")
 async def scrape_gsmsarena(request: ScrapeRequest):

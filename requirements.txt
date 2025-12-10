@@ -7,3 +7,4 @@ requests
 google-api-python-client
 google-generativeai
 apify-client
+ddgs
